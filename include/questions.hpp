@@ -1,0 +1,1 @@
+void askQuestion(const std::string& question);
