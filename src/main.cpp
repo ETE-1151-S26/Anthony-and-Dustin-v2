@@ -1,6 +1,11 @@
-#include "questions.hpp"
+#include <cstdlib>
+#include <ctime>
+#include "../include/questions.hpp"
 
-void main(){
+int main()
+{
+    std::srand(std::time(0));//seed random number generator 
+    startBlackjack();//Start the blackjack game
 
-    askQuestion("What is your name?");
+    return 0;
 }
