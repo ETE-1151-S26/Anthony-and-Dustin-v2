@@ -18,12 +18,12 @@ void showMainMenu()
 
 int getMenuChoice()
 {
-    While (true)
+    while (true)
     {
         std::cout << "Please enter your choice: ";
-        int choice = readInt();
-        if (choice >= 1 && choice <= 4)
-            return choice;
+        int c = readInt();
+        if (c >= 1 && c <= 4)
+            return c;
         std::cout << "Invalid choice. Please try again.\n";
     }
 }    
