@@ -2,17 +2,19 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: cl.exe build active file",
+            "label": "Build Casino (all cpp)",
             "command": "cl.exe",
             "args": [
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "${file}"
+                "/I${workspaceFolder}\\include",
+                "/Fe${workspaceFolder}\\casino.exe",
+                "${workspaceFolder}\\src\\main.cpp",
+                "${workspaceFolder}\\src\\questions.cpp"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$msCompile"

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "../include/questions.hpp"
+#include "questions.hpp"
 
 int main()
 {

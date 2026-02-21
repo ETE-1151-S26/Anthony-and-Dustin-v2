@@ -15,7 +15,7 @@
 *.obj
 *.yml
 *.plist
-*.json
+
 
 # Precompiled Headers
 *.gch
@@ -45,7 +45,10 @@
 *.dwo
 
 # Folders
-!.vscode/*
+
 !temp/
 build/
 bin/
+
+#VS code local config
+.vscode/

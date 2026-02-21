@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "../include/questions.hpp"
+#include "questions.hpp"
 
 int readInt()
 {
@@ -34,11 +34,11 @@ int getMenuChoice()
         std::cout << "Please enter your choice (1-4): ";
         int choice = readInt();
         
-        if (choice >= 1 && choice <= 4)
-        {    
+    if (choice >= 1 && choice <= 4)
+    {    
         return choice;
-        }
-            std::cout << "Invalid choice. Please try again.\n";
+    }
+    std::cout << "Invalid choice. Please try again.\n";
     }
 }    
 //Cards & Shoe
@@ -311,7 +311,7 @@ void playerTurn(int shoe[], int shoeSize, int &shoePos, int numDecks, int player
         }
         else if (decision == 3)
         {
-            //Double down: pay extra fixed bet, draw a car, and stand
+            //Double down: pay extra fixed bet, draw a card, and stand
             addMoney(&bankroll, -fixedBet);
             bet += fixedBet;
 
@@ -481,10 +481,10 @@ bool playBlackjackRound(int shoe[], int shoeSize, int &shoePos, int numDecks, co
     //Player plays hand if they didn't split
     if (didSplit == false)
     {
-        //If player doubles, stand automatically
-        if (firstChoice != 3)
+        //Continue only if hit on 1st decision
+        if (firstChoice == 1)
         {
-            playerTurn(shoe, shoeSize, shoePos, numDecks, hand1, count1, dealerHand, dealerCount, playerName, bankroll, bet1, fixedBet, false, quitRound);
+        playerTurn(shoe, shoeSize, shoePos, numDecks, hand1, count1, dealerHand, dealerCount, playerName, bankroll, bet1, fixedBet, false, quitRound);
         }
 
         if (quitRound == true)
@@ -498,10 +498,10 @@ bool playBlackjackRound(int shoe[], int shoeSize, int &shoePos, int numDecks, co
             return true; //return player to menu after penalty
         }
     }
-else
-{
-    //Player plays first hand
-    playerTurn(shoe, shoeSize, shoePos, numDecks, hand1, count1, dealerHand, dealerCount, playerName + " (Hand 1)", bankroll, bet1, fixedBet, false, quitRound);
+    else
+    {
+        //Player plays first hand
+        playerTurn(shoe, shoeSize, shoePos, numDecks, hand1, count1, dealerHand, dealerCount, playerName + " (Hand 1)", bankroll, bet1, fixedBet, false, quitRound);
 
     if (quitRound == true)
     {
@@ -532,6 +532,7 @@ else
 //Dealer plays if at least one player hand is still active
 bool bust1 = isBust(hand1, count1);
 bool bust2 = true;
+
 if (didSplit == true)
 {
     bust2 = isBust(hand2, count2);
@@ -541,11 +542,14 @@ if (bust1 == false || (didSplit == true && bust2 == false))
     dealerTurn(shoe, shoeSize, shoePos, numDecks, dealerHand, dealerCount);
 }
 
-//Show final hands
-std::cout << "\n===== Final =====\n";
+//Show final hands 
+std::cout << "\n===== Final Hands =====\n";
+
 if (didSplit == false)
 {
-    dealerTurn(shoe, shoeSize, shoePos, numDecks, dealerHand, dealerCount);
+    printHand("Dealer", dealerHand, dealerCount, false);
+    printHand(playerName, hand1, count1, false);
+    std::cout << "\n";
 }
 else
 {
@@ -580,68 +584,67 @@ else if (p1 < dealerVal)
 }
 else
 {
-    profit1 = 0;
+    profit1 = 0;//push
 }
 
-//Apply payout to bankroll
-if (profit1 > 0)
+//Hand 2 outcome if split
+ int profit2 = 0;
+
+if (didSplit == true)
 {
-    addMoney(&bankroll, bet1 + profit1);//return bet + profit
+int p2 = handValue(hand2, count2);
+
+if (p2 > 21)
+ {
+    profit2 = -bet2;
+ }
+else if (dealerVal > 21)
+{
+    profit2 = bet2;
 }
-else if (profit1 == 0)
+else if (p2 > dealerVal)
 {
-    std::cout << "Hand Profit: ";
-    if (profit1 >= 0) std::cout << "+$" << profit1 << "\n";
-    else std::cout << "-$" << (-profit1) << "\n";
+    profit2 = bet2;
+}
+else if (p2 < dealerVal)
+{
+    profit2 = -bet2;
 }
 else
 {
-    //Hand 2 outcome
-    int profit2 = 0;
-    int p2 = handValue(hand2, count2);
+    profit2 = 0;//push
+}
+}
 
-    if (p2 > 21)
-    {
-        profit2 = -bet2;
-    }
-    else if (dealerVal > 21)
-    {
-        profit2 = bet2;
-    }
-    else if (p2 > dealerVal)
-    {
-        profit2 = bet2;
-    }
-    else if (p2 < dealerVal)
-    {
-        profit2 = -bet2;
-    }
-    else
-    {
-        profit2 = 0;
-    }
-    if (profit2 > 0)
-    {
-        addMoney(&bankroll, bet2 + profit2);//return bet + profit
-    }
-    else if (profit2 == 0)
-    {
-       addMoney(&bankroll, bet2);//return bet
-    }
+//Apply payout to bankroll
+if (profit1 > 0) addMoney(&bankroll, bet1 + profit1);//return bet + profit
+else if (profit1 == 0) addMoney(&bankroll, bet1);
 
-    std::cout << "Hand 1 Profit: ";
-    if (profit1 >= 0) std::cout << "+$" << profit1 << "\n";
-    else std::cout << "-$" << (-profit1) << "\n";
+if (didSplit == true)
+{
+if (profit2 > 0) addMoney(&bankroll, bet2 + profit2);
+else if (profit2 == 0) addMoney(&bankroll, bet2);
+}
 
+//Print profit summary
+std::cout << "Hand 1 Profit: ";
+if (profit1 >= 0) std::cout << "+$" << profit1 << "\n";
+else std::cout << "-$" << (-profit1) << "\n";
+
+int totalProfit = profit1;
+
+if (didSplit == true)
+{
     std::cout << "Hand 2 Profit: ";
     if (profit2 >= 0) std::cout << "+$" << profit2 << "\n";
     else std::cout << "-$" << (-profit2) << "\n";
 
-    int totalProfit = profit1 + profit2;
+    totalProfit = profit1 + profit2;
+}
     std::cout << "Total Profit: ";
     if (totalProfit >= 0) std::cout << "+$" << totalProfit << "\n";
     else std::cout << "-$" << (-totalProfit) << "\n";
-}
+
 
 std::cout << "Bankroll: $" << bankroll << "\n";
 return false;
@@ -664,7 +667,7 @@ void startBlackjack(int &bankroll)
     shuffleShoe(shoe, shoeSize);
 
     std::cout << "\nWelcome, " << playerName << "!\n";
-    std::cout << "Bankroll: $:" << bankroll << " | Fixed bet: $50\n";
+    std::cout << "Bankroll: $" << bankroll << " | Fixed bet: $50\n";
 
     bool keepPlaying = true;
 
