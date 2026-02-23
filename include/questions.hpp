@@ -13,7 +13,6 @@ void startBlackjack(int &bankroll);
 
 //Functions for managing shoe (multiple decks) 
 void buildShoe(int shoe[], int shoeSize, int numDecks);
-void shuffleShoe(int shoe[], int shoeSize);
 int drawCard(int shoe[], int shoeSize, int &shoePos, int numDecks);
 
 //Card management

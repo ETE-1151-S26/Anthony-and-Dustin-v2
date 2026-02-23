@@ -8,10 +8,18 @@
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/I${workspaceFolder}\\include",
                 "/Fe${workspaceFolder}\\casino.exe",
                 "${workspaceFolder}\\src\\main.cpp",
-                "${workspaceFolder}\\src\\questions.cpp"
+                "${workspaceFolder}\\src\\Game.cpp",
+                "${workspaceFolder}\\src\\Player.cpp",
+                "${workspaceFolder}\\src\\Inventory.cpp",
+                "${workspaceFolder}\\src\\Item.cpp",
+                //Bj v1
+                "${workspaceFolder}\\src\\questions.cpp",
+
+                 // Tell compiler where headers are:
+                "/I",
+                "${workspaceFolder}\\include",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

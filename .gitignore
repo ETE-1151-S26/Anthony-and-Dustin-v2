@@ -49,6 +49,3 @@
 !temp/
 build/
 bin/
-
-#VS code local config
-.vscode/
