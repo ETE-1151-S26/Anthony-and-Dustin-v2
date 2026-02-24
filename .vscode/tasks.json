@@ -14,8 +14,7 @@
                 "${workspaceFolder}\\src\\Player.cpp",
                 "${workspaceFolder}\\src\\Inventory.cpp",
                 "${workspaceFolder}\\src\\Item.cpp",
-                //Bj v1
-                "${workspaceFolder}\\src\\questions.cpp",
+                
 
                  // Tell compiler where headers are:
                 "/I",

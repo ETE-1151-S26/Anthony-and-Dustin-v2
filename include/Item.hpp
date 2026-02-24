@@ -3,9 +3,9 @@
 
 enum TraitType
 {
-    Trait_Bankroll,
-    Trait_Luck,
-    Trait_HouseEdge
+    Trait_Bankroll,//applying item changes player's bankroll
+    Trait_Luck,//applying item changes player's luck
+    Trait_HouseEdge//applying item changes house edge
 };
 
 class Item
@@ -13,8 +13,8 @@ class Item
 private:
     std::string name;
     std::string description;
-    TraitType traitType;
-    int traitValue;
+    TraitType traitType;//affected stat
+    int traitValue;//how much it affects the stat
 
 public:
     Item();

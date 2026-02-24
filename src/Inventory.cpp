@@ -18,7 +18,7 @@ int Inventory::getCapacity() const
 
 bool Inventory::addItem(const Item& item)
 {
-    if(count >= Capacity) return false;
+    if(count >= Capacity) return false;//If inventory full, do nothing
     items[count] = item;
     count++;
     return true;

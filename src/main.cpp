@@ -9,7 +9,7 @@ int main()
     std::srand((unsigned)std::time(0));
 
     Game game;
-    game.setup();
+    game.setup();//main game loop
 
     bool running = true;
 
@@ -17,7 +17,7 @@ int main()
     {
         std::cout << "\n> ";
 
-        std::string command;
+        std::string command;//read user command input
         std::cin >> command;
 
         if (command == "help")
@@ -32,13 +32,13 @@ int main()
         {
             game.cmdInventory();   
         }
-        else if (command == "inspect")
+        else if (command == "inspect")//inspect requires argument: item name
         {
             std::string arg;
             std::cin >> arg;
             game.cmdInspect(arg);
         }
-        else if (command == "apply")
+        else if (command == "apply")//apply requires argument: item name
         {
             std::string arg;
             std::cin >> arg;

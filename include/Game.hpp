@@ -3,7 +3,7 @@
 #include "Player.hpp"
 #include "Item.hpp"
 
-class Game
+class Game//handles player setup, item management, game state variables, and command helpers
 {
 private: 
     Player player;
@@ -12,15 +12,15 @@ private:
     int winStreak;
 
     static const int Item_List_Size = 10;
-    Item itemList[Item_List_Size];
+    Item itemList[Item_List_Size];//fixed array of items used as item catalog
 
 public:
     Game();
     
-    void setup();
+    void setup();//setup runs once at start 
 
-    void showHelp() const;
-
+    void showHelp() const;//command outputs
+    //command handlers (called by main.cpp)
     void cmdProfile() const;
     void cmdInventory() const;
     void cmdInspect(const std::string& itemName) const;
