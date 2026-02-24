@@ -1,38 +1,63 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "questions.hpp"
+#include <string>
+#include "Game.hpp"
 
 int main()
 {
-    std::srand(std::time(0));//seed random number generator 
-    
-    int bankroll = 1000;//Shared bankroll for player casino games
-    bool running = true;
-   
-    while (running == true)
-    {
-        showMainMenu();
-        int choice = getMenuChoice();
+    std::srand((unsigned)std::time(0));
 
-        if (choice == 1)
+    Game game;
+    game.setup();
+
+    bool running = true;
+
+    while (running)
+    {
+        std::cout << "\n> ";
+
+        std::string command;
+        std::cin >> command;
+
+        if (command == "help")
         {
-            startBlackjack(bankroll);
+            game.showHelp();
         }
-        else if (choice == 2)
+        else if (command == "profile")
         {
-            std::cout << "\nPoker (Coming Soon)\n";
+            game.cmdProfile();
         }
-        else if (choice == 3)
+        else if (command == "inventory")
         {
-            std::cout << "\nRoulette (Coming Soon)\n";
+            game.cmdInventory();   
         }
-        else if (choice == 4)
+        else if (command == "inspect")
+        {
+            std::string arg;
+            std::cin >> arg;
+            game.cmdInspect(arg);
+        }
+        else if (command == "apply")
+        {
+            std::string arg;
+            std::cin >> arg;
+            game.cmdApply(arg);
+        }
+        else if (command == "play")
+        {
+            game.cmdPlay();
+        }
+        else if (command == "quit")
         {
             running = false;
         }
+        else 
+        {
+            std::cout << "Unknown command. Type 'help' .\n";
+        }
     }
 
-    std::cout << "\nThank you for visiting the Casino! Your final bankroll is: $" << bankroll << "\n";
+    std::cout << "\nGoodbye!\n";
     return 0;
 }
