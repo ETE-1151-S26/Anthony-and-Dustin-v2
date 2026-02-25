@@ -1,12 +1,23 @@
 #include <iostream>
+#include <string>
 #include <cstdlib>
 #include "Game.hpp"
+#include "Blackjack.hpp"
+
+static std::string traitTypeToString(TraitType t)
+{
+    if (t == Trait_Bankroll) return "Bankroll";
+    if (t == Trait_Luck) return "Luck";
+    return "House Edge";
+}
 
 Game::Game()
 {
     //Initialize game state variables
     roundNumber = 0;
     winStreak = 0;
+
+    currentGame =Game_Blackjack;//default to blackjack, other games can be added later
 
     //Bankroll items
     itemList[0] = Item("chips50", "A stack of chips worth fifty dollars.", Trait_Bankroll, 50);
@@ -23,6 +34,18 @@ Game::Game()
     itemList[7] = Item("cardguide", "A guidebook that provides insights into the cards and their probabilities.", Trait_HouseEdge, -1);
     itemList[8] = Item("vipband", "A VIP wristband that gets you friendlier rules from the dealer.", Trait_HouseEdge, -1);
     itemList[9] = Item("pitbossfavor", "A favor from the pit boss that lowers the pressure at the table.", Trait_HouseEdge, -2);
+
+    //Shop Item Prices
+    itemPrice[0] = 50;//chips50
+    itemPrice[1] = 100;//chips100
+    itemPrice[2] = 200;//chips200
+    itemPrice[3] = 300;//vaultcoupon
+    itemPrice[4] = 75;//luckyshirt
+    itemPrice[5] = 60;//rabbitfoot
+    itemPrice[6] = 120;//goldbracelet
+    itemPrice[7] = 80;//cardguide
+    itemPrice[8] = 90;//vipband
+    itemPrice[9] = 150;//pitbossfavor
 }
 
 void Game::setup()//setup runs once at start, asks for player name, type, then loads starting stats and inventory
@@ -60,6 +83,10 @@ void Game::showHelp() const//outputs for help command
     std::cout << "inventory\n";
     std::cout << "inspect <item>\n";
     std::cout << "apply <item>\n";
+    std::cout << "shop\n";
+    std::cout << "buy <item>\n";
+    std::cout << "games\n";
+    std::cout << "switch <game>\n";
     std::cout << "play\n";
     std::cout << "quit\n";
 }
@@ -87,7 +114,10 @@ void Game::cmdInspect(const std::string& itemName) const//looks up item by name 
 
     std::cout << "\n=== Inspect: " << item.getName() << " ===\n";
     std::cout << item.getDescription() << "\n";
-    std::cout << "Trait Value: " << item.getTraitValue() << "\n";
+    std::cout << "Trait: " << traitTypeToString(item.getTraitType()) << " (";
+    int v = item.getTraitValue();
+    if (v >= 0) std::cout << "+";
+    std::cout << v << ")\n";
 }
 
 void Game::cmdApply(const std::string& itemName)//finds item in inventory, applies its trait effect to player stats, then removes it from inventory
@@ -114,29 +144,128 @@ void Game::cmdPlay()
     //advances game state
     roundNumber++;
 
+    int result = 0;
+
+    if (currentGame == Game_Blackjack)
+    {
+        result = playBlackjackRound(player.getLuck(), player.getHouseEdge());
+    }
+
+    else if (currentGame == Game_Roulette)
+    {
+        std::cout << "\nRoulette is coming soon!\n";
+        result = 0;
+    }
     
-    int roll = std::rand() % 100;
-
-    int threshold = 50;//Base threshold = 50%
-    threshold += player.getLuck();//Luck increases chance to win    
-    threshold -= player.getHouseEdge();//House edge reduces chance to win
-
-    if (roll < threshold)
+    else if (currentGame == Game_Poker)
     {
-        winStreak++;
-        player.addBankroll(50);
-        std::cout << "You won a quick bet! +$50\n";
+        std::cout << "\nPoker is coming soon!\n";
+        result = 0;
+    }
+    
+    player.addBankroll(result);
+
+    if (player.getBankroll() <=0)
+    {
+        std::cout << "You are out of money! Game Over.\n";
+        std::exit(0);//end game if player goes bankrupt
     }
 
-    else
-    {
-        winStreak = 0;
-        player.addBankroll(-50);
-        std::cout << "You lost a quick bet. -$50\n";
-    }
+    if (result > 0)
+    winStreak++;
+    else if (result < 0)
+    winStreak = 0;
 
     //displays updated game state after the round
     std::cout << "Round Number: " << roundNumber << "\n";
     std::cout << "Win Streak: " << winStreak << "\n";
     std::cout << "Bankroll: $" << player.getBankroll() << "\n";
 }    
+
+void Game::cmdShop() const{
+    std::cout << "\n=== Shop ===\n";
+    std::cout << "Your Bankroll: $" << player.getBankroll() << "\n";
+    std::cout << "Use: buy <item>\n\n";
+
+    for (int i = 0; i < Item_Count; i++)
+    {
+        std::cout << itemList[i].getName()
+        << " - $" << itemPrice[i]
+        << " | " << traitTypeToString(itemList[i].getTraitType()) << " ("
+        << (itemList[i].getTraitValue() >= 0 ? "+" : "")
+        << itemList[i].getTraitValue()
+        << ")\n";
+    }
+}
+
+void Game::cmdBuy(const std::string& itemName)
+{
+    int index = -1;
+
+    for (int i = 0; i < Item_Count; i++)
+    {
+        if (itemList[i].getName() == itemName)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1)
+    {
+        std::cout << "Item '" << itemName << "' not found in shop.\n";
+        return;
+    }
+
+    int cost = itemPrice[index];
+
+    if (player.getBankroll() < cost)
+    {
+        std::cout << "You don't have enough money to buy '" << itemName << "'.\n";
+        return;
+    }
+
+   if (!player.getInventory().addItem(itemList[index]))
+   {
+       std::cout << "Your inventory is full. Cannot buy '" << itemName << "'.\n";
+       return;
+   }
+   
+   player.addBankroll(-cost);
+
+   std::cout << "You bought '" << itemName << "' for $" << cost << ".\n";
+   std::cout << "Remaining Bankroll: $" << player.getBankroll() << "\n";
+}   
+
+void Game::cmdGames() const
+{
+    std::cout << "\n=== Available Games ===\n";
+    std::cout << "blackjack\n";
+    std::cout << "roulette (Coming Soon)\n";
+    std::cout << "poker (Coming Soon)\n";
+    std::cout << "Use: switch <game>\n";
+}
+
+void Game::cmdSwitch(const std::string& gameName)
+{
+    if (gameName == "blackjack")
+    {
+        currentGame = Game_Blackjack;
+        std::cout << "Switched to Blackjack.\n";
+    }
+    else if (gameName == "roulette")
+    {
+        currentGame = Game_Roulette;
+        std::cout << "Switched to Roulette. (coming soon)\n";
+    }
+    else if (gameName == "poker")
+    {
+        currentGame = Game_Poker;
+        std::cout << "Switched to Poker. (coming soon)\n";
+    }
+    else
+    {
+        std::cout << "Game '" << gameName << "' not recognized.\n";
+        std::cout << "Type 'games' to see available games.\n";
+    }
+}

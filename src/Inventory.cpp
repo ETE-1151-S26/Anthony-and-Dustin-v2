@@ -69,6 +69,17 @@ void Inventory::display() const
 
     for (int i = 0; i < count; i++)
     {
-        std::cout << "- " << items[i].getName() << "\n";
+        std::cout << "- " << items[i].getName() << " | ";
+        
+        //show trait type
+        if (items[i].getTraitType() == Trait_Bankroll) std::cout << "Bankroll";
+        else if (items[i].getTraitType() == Trait_Luck) std::cout << "Luck";
+        else std::cout << "House Edge";
+
+        //show signed trait value
+        int v = items[i].getTraitValue();
+        std::cout << " (";
+        if (v >= 0) std::cout << "+";
+        std::cout << v << ")\n";
     }
 }

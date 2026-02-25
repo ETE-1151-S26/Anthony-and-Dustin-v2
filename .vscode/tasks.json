@@ -14,7 +14,7 @@
                 "${workspaceFolder}\\src\\Player.cpp",
                 "${workspaceFolder}\\src\\Inventory.cpp",
                 "${workspaceFolder}\\src\\Item.cpp",
-                
+                "${workspaceFolder}\\src\\Blackjack.cpp",
 
                  // Tell compiler where headers are:
                 "/I",

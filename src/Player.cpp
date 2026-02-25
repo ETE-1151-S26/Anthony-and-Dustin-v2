@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Player.hpp"
+
 //starting stats tables
 static const int Start_Bankroll[4] = {0, 1200, 900, 1000 };
 static const int Start_Luck[4] = {0, 1, 3, 6 };
@@ -37,13 +38,13 @@ void Player::showProfile() const
 
     std::cout << "Bankroll: $" << bankroll << "\n";
     std::cout << "Luck: " << luck << "\n";
-    std::cout << "House Edge: " << houseEdge << "\n";
+    std::cout << "House Edge: " << houseEdge << "%\n";
 }
 
 void Player::addBankroll(int amount)
 {
     bankroll += amount;
-    if (houseEdge < 0) houseEdge = 0;//bankroll can't be negative
+    if (bankroll < 0) bankroll = 0;//bankroll can't be negative
 }
 
 void Player::addLuck(int amount)

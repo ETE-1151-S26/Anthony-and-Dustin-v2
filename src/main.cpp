@@ -35,14 +35,62 @@ int main()
         else if (command == "inspect")//inspect requires argument: item name
         {
             std::string arg;
-            std::cin >> arg;
-            game.cmdInspect(arg);
+            if (!(std::cin >> arg))
+            {
+                std::cin.clear();
+                std::cout << "Usage: inspect <item>\n";
+            }
+            else
+            {
+                game.cmdInspect(arg);
+            }
         }
         else if (command == "apply")//apply requires argument: item name
         {
             std::string arg;
-            std::cin >> arg;
-            game.cmdApply(arg);
+            if (!(std::cin >> arg))
+            {
+                std::cin.clear();
+                std::cout << "Usage: apply <item>\n";
+            }
+            else
+            {
+                game.cmdApply(arg);
+            }
+        }
+        else if (command == "shop")
+        {
+            game.cmdShop();
+        }
+        else if (command == "buy")//buy requires argument: item name
+        {
+            std::string arg;
+            if (!(std::cin >> arg))
+            {
+                std::cin.clear();
+                std::cout << "Usage: buy <item>\n";
+            }
+            else
+            {
+                game.cmdBuy(arg);
+            }
+        }
+        else if(command == "games")
+        {
+            game.cmdGames();
+        }
+        else if (command == "switch")//switch requires argument: game name
+        {
+            std::string arg;
+            if (!(std::cin >> arg))
+            {
+                std::cin.clear();
+                std::cout << "Usage: switch <game>\n";
+            }
+            else
+            {
+                game.cmdSwitch(arg);
+            }
         }
         else if (command == "play")
         {
@@ -52,6 +100,8 @@ int main()
         {
             running = false;
         }
+
+        
         else 
         {
             std::cout << "Unknown command. Type 'help' .\n";
