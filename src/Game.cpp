@@ -1,10 +1,14 @@
+//Game.cpp 
+//Implements the Game class including command handling, gameplay rounds, and shop purchases
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include "Game.hpp"
 #include "Blackjack.hpp"
 
-static std::string traitTypeToString(TraitType t)
+//Converts TraitType enum value into readable string for printing item descriptions and shop listings
+static std::string traitTypeToString(TraitType t)//placement here since it's only used in Game.cpp to print trait types
 {
     if (t == Trait_Bankroll) return "Bankroll";
     if (t == Trait_Luck) return "Luck";
@@ -13,12 +17,13 @@ static std::string traitTypeToString(TraitType t)
 
 Game::Game()
 {
-    //Initialize game state variables
-    roundNumber = 0;
-    winStreak = 0;
+    roundNumber = 0;//total rounds played
+    winStreak = 0;//consecutive wins
 
-    currentGame =Game_Blackjack;//default to blackjack, other games can be added later
+    currentGame = Game_Blackjack;//default to blackjack, other games can be added later
 
+    //initialize items available in the shop
+    //Each item stores name, description, trait type, and trait value
     //Bankroll items
     itemList[0] = Item("chips50", "A stack of chips worth fifty dollars.", Trait_Bankroll, 50);
     itemList[1] = Item("chips100", "A stack of chips worth one hundred dollars.", Trait_Bankroll, 100);
@@ -30,7 +35,7 @@ Game::Game()
     itemList[5] = Item("rabbitfoot", "A rabbit's foot that brings good luck to the holder.", Trait_Luck, 1);
     itemList[6] = Item("goldbracelet", "A gold bracelet that seems to shimmer with an otherworldly light.", Trait_Luck, 2);
     
-    //House Edge Reducers
+    //House Edge Reducers (Beneficial for player)
     itemList[7] = Item("cardguide", "A guidebook that provides insights into the cards and their probabilities.", Trait_HouseEdge, -1);
     itemList[8] = Item("vipband", "A VIP wristband that gets you friendlier rules from the dealer.", Trait_HouseEdge, -1);
     itemList[9] = Item("pitbossfavor", "A favor from the pit boss that lowers the pressure at the table.", Trait_HouseEdge, -2);
@@ -48,7 +53,7 @@ Game::Game()
     itemPrice[9] = 150;//pitbossfavor
 }
 
-void Game::setup()//setup runs once at start, asks for player name, type, then loads starting stats and inventory
+void Game::setup()//setup runs once at start, asks for player name and archetype, then loads starting stats and inventory
 {
     std::string name;
     int choice;
@@ -57,28 +62,32 @@ void Game::setup()//setup runs once at start, asks for player name, type, then l
     std::cin >>name;
 
     std::cout <<"\nChoose your player type:\n";
-    std::cout << "1) High Roller (Bankroll 1200, Luck 1)\n";
-    std::cout << "2) Card Shark (Bankroll 900, Luck 3)\n";
-    std::cout << "3) Lucky Newbie (Bankroll 1000, Luck 6)\n";
+    std::cout << "1) High Roller (Bankroll 300, Luck 1)\n";
+    std::cout << "2) Card Shark (Bankroll 200, Luck 3)\n";
+    std::cout << "3) Lucky Newbie (Bankroll 100, Luck 6)\n";
     std::cout << "Enter choice (1-3): ";
     std::cin >> choice;
 
-if (choice < 1 || choice > 3) choice = 3;//Validation(fallback to Lucky Newbie)
+    if (choice < 1 || choice > 3) //Input validation: if player enters invalid choice, defaults to Lucky Newbie
+    {
+        choice = 3;
+    }
 
-player.initialize(name, (PlayerType)choice);
+    player.initialize(name, (PlayerType)choice);//Initialize player stats based on chosen archetype
 
-//starter Inventory
-player.getInventory().addItem(itemList[0]);//chips50
-player.getInventory().addItem(itemList[4]);//luckyshirt
-player.getInventory().addItem(itemList[7]);//cardguide
+    //starter inventory: gives player a small bankroll boost and starter luck and house edge reducer at beginning of game
+    player.getInventory().addItem(itemList[0]);//chips50
+    player.getInventory().addItem(itemList[4]);//luckyshirt
+    player.getInventory().addItem(itemList[7]);//cardguide
 
-std::cout << "\nType 'help' to see available commands.\n";
+    std::cout << "\nType 'help' to see available commands.\n";
 }
 
-void Game::showHelp() const//outputs for help command
+void Game::showHelp() const
 {
-    std::cout << "\n=== Commands ===\n";
-    std::cout << "help\n";
+    
+    //Prints a list of commands the player can type into the console 
+    std::cout << "\n=== Available Commands ===\n";
     std::cout << "profile\n";
     std::cout << "inventory\n";
     std::cout << "inspect <item>\n";
@@ -91,27 +100,28 @@ void Game::showHelp() const//outputs for help command
     std::cout << "quit\n";
 }
 
-void Game::cmdProfile() const//outputs player profile and game state info
+void Game::cmdProfile() const//outputs player info and game progress info
 {
     player.showProfile();
     std::cout << "Round Number: " << roundNumber << "\n";
     std::cout << "Win Streak: " << winStreak << "\n";
 }
 
-void Game::cmdInventory() const//displays inventory 
+void Game::cmdInventory() const//displays player inventory contents
 {
     player.getInventory().display();
 }
 
-void Game::cmdInspect(const std::string& itemName) const//looks up item by name in player inventory and displays description and trait value if found
+void Game::cmdInspect(const std::string& itemName) const//displays item's description and trait details if player owns the item
 {
     Item item;
-    if (!player.getInventory().getItemByName(itemName, item))
+    if (!player.getInventory().getItemByName(itemName, item))//returns true if item found, otherwise false
     {
         std::cout << "You don't have '" << itemName << "'.\n";
         return;
     }
 
+    //print trait type and signed value
     std::cout << "\n=== Inspect: " << item.getName() << " ===\n";
     std::cout << item.getDescription() << "\n";
     std::cout << "Trait: " << traitTypeToString(item.getTraitType()) << " (";
@@ -120,69 +130,70 @@ void Game::cmdInspect(const std::string& itemName) const//looks up item by name 
     std::cout << v << ")\n";
 }
 
-void Game::cmdApply(const std::string& itemName)//finds item in inventory, applies its trait effect to player stats, then removes it from inventory
+void Game::cmdApply(const std::string& itemName)//finds item in inventory, applies its trait effect to player stats, then removes it from inventory 
 {
     Item item;
-    if (!player.getInventory().getItemByName(itemName, item))
+    if (!player.getInventory().getItemByName(itemName, item))//checks if player owns the item before applying it
     {
         std::cout << "You don't have '" << itemName << "'.\n";
         return;
     }
     
-    //apply item effect based on trait type
+    //apply item's trait effect to player's stats
     if (item.getTraitType() == Trait_Bankroll) player.addBankroll(item.getTraitValue());
     else if (item.getTraitType() == Trait_Luck) player.addLuck(item.getTraitValue());
     else if (item.getTraitType() == Trait_HouseEdge) player.addHouseEdge(item.getTraitValue());
 
-    player.getInventory().removeItemByName(itemName);//remove item after applying
+    player.getInventory().removeItemByName(itemName);//remove item after applying (consumable)
 
     std::cout << "You applied '" << itemName << "'.\n";
 }
 
 void Game::cmdPlay()
 {
-    //advances game state
+    //Player plays one round of the currently active game, then updates game state variables based on the result
     roundNumber++;
 
-    int result = 0;
+    int result = 0;//bankroll change for the round(+50 for win, -50 for loss, 0 for push)
 
+    //Determine which game is currently active
     if (currentGame == Game_Blackjack)
     {
-        result = playBlackjackRound(player.getLuck(), player.getHouseEdge());
+        result = playBlackjackRound(player.getLuck(), player.getHouseEdge());//blackjack round uses luck and house edge to modify win/push probability
     }
 
-    else if (currentGame == Game_Roulette)
+    else 
     {
-        std::cout << "\nRoulette is coming soon!\n";
-        result = 0;
+        //placeholder for future games
+        if (currentGame == Game_Roulette) std::cout << "\nRoulette is coming soon!\n";
+        else if (currentGame == Game_Poker) std::cout << "\nPoker is coming soon!\n";
+
+        result = 0;//no change to bankroll since other games aren't implemented yet
     }
     
-    else if (currentGame == Game_Poker)
-    {
-        std::cout << "\nPoker is coming soon!\n";
-        result = 0;
-    }
-    
+    //update player bankroll based on game result
     player.addBankroll(result);
 
+    //If bankroll hits 0, end the game with a game over message
     if (player.getBankroll() <=0)
     {
         std::cout << "You are out of money! Game Over.\n";
-        std::exit(0);//end game if player goes bankrupt
+        std::exit(0);
     }
 
-    if (result > 0)
-    winStreak++;
-    else if (result < 0)
-    winStreak = 0;
-
+    //update win streak: if player won the round, increase win streak by 1, if they lost reset win streak to 0, if push leave win streak unchanged
+    if (result > 0) winStreak++;
+    else if (result < 0) winStreak = 0;
+    
     //displays updated game state after the round
     std::cout << "Round Number: " << roundNumber << "\n";
     std::cout << "Win Streak: " << winStreak << "\n";
     std::cout << "Bankroll: $" << player.getBankroll() << "\n";
 }    
 
-void Game::cmdShop() const{
+void Game::cmdShop() const
+{
+    //Display every item available in the shop along with price and trait effect
     std::cout << "\n=== Shop ===\n";
     std::cout << "Your Bankroll: $" << player.getBankroll() << "\n";
     std::cout << "Use: buy <item>\n\n";
@@ -200,7 +211,7 @@ void Game::cmdShop() const{
 
 void Game::cmdBuy(const std::string& itemName)
 {
-    int index = -1;
+    int index = -1;//search shop item list to find index of requested item
 
     for (int i = 0; i < Item_Count; i++)
     {
@@ -211,7 +222,7 @@ void Game::cmdBuy(const std::string& itemName)
         }
     }
 
-    if (index == -1)
+    if (index == -1)//if item doesnt exist in the shop, abort
     {
         std::cout << "Item '" << itemName << "' not found in shop.\n";
         return;
@@ -219,25 +230,25 @@ void Game::cmdBuy(const std::string& itemName)
 
     int cost = itemPrice[index];
 
-    if (player.getBankroll() < cost)
+    if (player.getBankroll() < cost)//checks player bankroll to see if player can afford the item
     {
         std::cout << "You don't have enough money to buy '" << itemName << "'.\n";
         return;
     }
 
-   if (!player.getInventory().addItem(itemList[index]))
+   if (!player.getInventory().addItem(itemList[index]))//checks whether item can be purchased if inventory space is available
    {
        std::cout << "Your inventory is full. Cannot buy '" << itemName << "'.\n";
        return;
    }
    
-   player.addBankroll(-cost);
+   player.addBankroll(-cost);//deduct item cost from player bankroll
 
    std::cout << "You bought '" << itemName << "' for $" << cost << ".\n";
    std::cout << "Remaining Bankroll: $" << player.getBankroll() << "\n";
 }   
 
-void Game::cmdGames() const
+void Game::cmdGames() const//displays available casino games and how to switch
 {
     std::cout << "\n=== Available Games ===\n";
     std::cout << "blackjack\n";
@@ -248,6 +259,7 @@ void Game::cmdGames() const
 
 void Game::cmdSwitch(const std::string& gameName)
 {
+    //changes currently active game 
     if (gameName == "blackjack")
     {
         currentGame = Game_Blackjack;

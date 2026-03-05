@@ -1,3 +1,6 @@
+//main.cpp
+//Handles the main command loop 
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -6,10 +9,11 @@
 
 int main()
 {
+    //Seed random number generator 
     std::srand((unsigned)std::time(0));
 
     Game game;
-    game.setup();//main game loop
+    game.setup();//Initializes player and starting items
 
     bool running = true;
 
@@ -35,73 +39,82 @@ int main()
         else if (command == "inspect")//inspect requires argument: item name
         {
             std::string arg;
-            if (!(std::cin >> arg))
+
+            if (std::cin >> arg)
             {
-                std::cin.clear();
-                std::cout << "Usage: inspect <item>\n";
+                  game.cmdInspect(arg);
             }
             else
             {
-                game.cmdInspect(arg);
+              std::cout << "Usage: inspect <item>\n";
             }
         }
+
         else if (command == "apply")//apply requires argument: item name
         {
             std::string arg;
-            if (!(std::cin >> arg))
-            {
-                std::cin.clear();
-                std::cout << "Usage: apply <item>\n";
-            }
-            else
+
+            if (std::cin >> arg)
             {
                 game.cmdApply(arg);
             }
+
+            else
+            {
+                std::cout << "Usage: apply <item>\n";
+            }
         }
+
         else if (command == "shop")
         {
             game.cmdShop();
         }
+
         else if (command == "buy")//buy requires argument: item name
         {
             std::string arg;
-            if (!(std::cin >> arg))
-            {
-                std::cin.clear();
-                std::cout << "Usage: buy <item>\n";
-            }
-            else
+
+            if (std::cin >> arg)
             {
                 game.cmdBuy(arg);
             }
+
+            else
+            {
+                std::cout << "Usage: buy <item>\n";
+            }
         }
+
         else if(command == "games")
         {
             game.cmdGames();
         }
+
         else if (command == "switch")//switch requires argument: game name
         {
             std::string arg;
-            if (!(std::cin >> arg))
+            
+            if (std::cin >> arg)
             {
-                std::cin.clear();
-                std::cout << "Usage: switch <game>\n";
+                game.cmdSwitch(arg); 
             }
+
             else
             {
-                game.cmdSwitch(arg);
+                std::cout << "Usage: switch <game>\n";
             }
         }
+
         else if (command == "play")
         {
             game.cmdPlay();
         }
+
         else if (command == "quit")
         {
             running = false;
         }
 
-        
         else 
         {
             std::cout << "Unknown command. Type 'help' .\n";

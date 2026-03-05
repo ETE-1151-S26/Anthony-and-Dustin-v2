@@ -1,3 +1,8 @@
+//Blackjack.cpp
+//Implements the Blackjack game 
+//Blackjack is probability based
+//Plays a single round and returns bankroll change for that round
+
 #include <iostream>
 #include <cstdlib>
 #include "Blackjack.hpp"
@@ -6,32 +11,41 @@ int playBlackjackRound(int luck, int houseEdge)
 {
     const int betAmount = 50;
 
+    //Base probabilities (percent)
+    const int BaseWinChance = 42;
+    const int BasePushChance = 6;
+
+    //Clamp limits (percent)
+    const int MinWinChance = 5;
+    const int MaxWinChance = 90;
+
+    const int MinPushChance = 2;
+    const int MaxPushChance = 15;
+
+    const int MaxTotalChance = 95;//win + push can't exceed this to ensure there's always a chance to lose
+
     std::cout << "\n=== Blackjack Round ===\n";
 
-    //Base win chance = 42% (casino edge)
-    int winChance = 42;
-
-    //luck improves chance
+    int winChance = BaseWinChance;
     winChance += luck;
-
-    //House edge reduces chance
     winChance -= houseEdge;
 
-    if (winChance < 5) winChance = 5;
-    if (winChance > 90) winChance = 90;
+    //Clamp win chance to limits
+    if (winChance < MinWinChance) winChance = MinWinChance;
+    if (winChance > MaxWinChance) winChance = MaxWinChance;
 
     //push chance (tie)
-    int pushChance = 6;
+    int pushChance = BasePushChance;
     pushChance += (houseEdge / 2); //house edge increases push chance
     pushChance -= (luck / 3); //luck reduces push chance
 
-    if (pushChance < 2) pushChance = 2;
-    if (pushChance > 15) pushChance = 15;
+    if (pushChance < MinPushChance) pushChance = MinPushChance;
+    if (pushChance > MaxPushChance) pushChance = MaxPushChance;
 
-    if (winChance + pushChance > 95)
+    if (winChance + pushChance > MaxTotalChance)
     {
-        pushChance = 95 - winChance;
-        if (pushChance < 2) pushChance = 2;
+        pushChance = MaxTotalChance - winChance;
+        if (pushChance < MinPushChance) pushChance = MinPushChance;
     }
 
     //print chances so the player can see the impact of their stats

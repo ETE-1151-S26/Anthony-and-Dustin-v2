@@ -2,7 +2,11 @@ Stack the Odds
 -A Modular Console-Based Casino Game Built in C++
 
 Game Concept
--In Stack the Odds, the player enters a casino that is being rennovated, with Blackjack being the only playable game at the moment. The gameplay revolves around manipulating probability by collecting stat-altering items that modify the player's attributes. The system was designed with the intention of simulating a scalable altered casino experience. Despite Blackjack being the only playable game, placeholders were set in the menu for Poker and Roulette to be added in the future. Players should strategically acquire items to "Stack the Odds" in their favor
+-In Stack the Odds, the player enters a casino that is being rennovated, with Blackjack being the only playable game at the moment. 
+-The gameplay revolves around manipulating probability by collecting stat-altering items that modify the player's attributes. 
+-The system was designed with the intention of simulating a scalable altered casino experience. 
+-Despite Blackjack being the only playable game, placeholders were set in the menu for Poker and Roulette to be added in the future. 
+-Players should strategically acquire items to "Stack the Odds" in their favor
 
 Program Architecture and Design Decisions
 -The program consists of core classes that help organize responsibilities.
@@ -29,9 +33,9 @@ Program Architecture and Design Decisions
 
 Archetype           Bankrol             House Edge          Luck
 __________________________________________________________________
-*High Roller         1200                   5                1
-*Card Shark          900                    3                3
-*Lucky Newbie        1000                   6                6
+*High Roller         300                   5                1
+*Card Shark          200                   3                3
+*Lucky Newbie        100                   6                6
 
 Item Database (10 Items)
 -Each item has a:
@@ -117,6 +121,55 @@ Game State Variables
  *Win streak
  *Bankroll
 
-*Note* The system's command driven loop allows for the player to keep playing until deciding to quit or running out of money.
+*Note* The system's command driven loop allows for the player to keep playing until deciding to quit or running out of money. Additionally, the state information updates after each round.
 
-User manual 
+User Manual 
+-The program operates using command-driven input. Commands must be typed exactly as shown.
+
+ Commands and Usage:
+ 
+ -help
+ Displays the list of available commands and their usage.
+
+-profile
+Displays the player's current stats including:
+Bankroll, Luck, and House Edge.
+
+-inventory
+Shows all items currently stored in the player's inventory.
+
+-inspect <item>
+Displays detailed information about an item in the player's inventory.
+
+Example:
+inspect luckyshirt
+
+-apply <item>
+Applies the item's effect to the player and removes it from the inventory.
+
+Example:
+apply rabbitfoot
+
+-shop
+Displays all items available for purchase in the casino shop.
+
+-buy <item>
+Purchases an item from the shop if the player has enough money and inventory space.
+
+Example:
+buy luckyshirt
+
+-games
+Displays the list of available casino games.
+
+-switch <game>
+Switches the currently selected casino game.
+
+Example:
+switch blackjack
+
+-play
+Plays one round of the currently selected game.
+
+-quit
+Exits the program.
